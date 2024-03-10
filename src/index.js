@@ -2,7 +2,7 @@ import dotenv from 'dotenv';
 import express from 'express'
 dotenv.config()
 import DB_Connection from "./db/index.js";
-
+const app=express();
 
 DB_Connection().then(()=>{
 
