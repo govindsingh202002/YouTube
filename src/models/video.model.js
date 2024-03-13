@@ -1,52 +1,47 @@
-/*     Video Model       
-id------------------string
-owner---------------ObjectId
-videofile-----------string
-thumnail------------string
-description---------string
-title---------------string
-duration------------Number
-viewa---------------Number
-ispublished---------boolean
-createAt------------Date
-updatedAt-----------Date
-*/
+import mongoose, {Schema} from "mongoose";
+import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2";
 
-import mongoose from 'mongoose';
-import mongooseAggragatePaginate from 'mongoose-aggregate-paginate-v2';
+const videoSchema = new Schema(
+    {
+        videoFile: {
+            type: String, //cloudinary url
+            required: true
+        },
+        thumbnail: {
+            type: String, //cloudinary url
+            required: true
+        },
+        title: {
+            type: String, 
+            required: true
+        },
+        description: {
+            type: String, 
+            required: true
+        },
+        duration: {
+            type: Number, 
+            required: true
+        },
+        views: {
+            type: Number,
+            default: 0
+        },
+        isPublished: {
+            type: Boolean,
+            default: true
+        },
+        owner: {
+            type: Schema.Types.ObjectId,
+            ref: "User"
+        }
 
-
-const videoSchema=new mongoose.Schema({
-    videoFile:{
-        type:String,
-        required:true,
-    },
-    thumNail:{
-        type:String,
-        required:true,
-    },
-    owner:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:"User"
-    },
-    title:{
-        type:String,
-    },
-    description:{
-        type:String,
-    },
-    isPublished:{
-        type:Boolean,
-        required:[true,"Password is required"]
-    },
-    duration:{
-        type:Number
-    },
-    views:{
-        type:Number
+    }, 
+    {
+        timestamps: true
     }
-},{timestamps:true});
+)
 
-videoSchema.plugin(mongooseAggragatePaginate);
+videoSchema.plugin(mongooseAggregatePaginate)
 
-export const Video=mongoose.model("Video",videoSchema);
+export const Video = mongoose.model("Video", videoSchema)
