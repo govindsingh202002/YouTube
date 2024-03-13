@@ -18,9 +18,11 @@ return response
 */
 
 const registerUser=asyncHandler(async (req,res)=>{ 
+    
+// console.log(res);
 const {fullName,email,username,password}=req.body;
 // console.log(fullName,email,username,password);
-// console.log(req.body)
+//  console.log(req.body)
 
 //validation of user details
 if([fullName,email,password,username].some((field)=> field?.trim()==="")){
@@ -28,7 +30,7 @@ if([fullName,email,password,username].some((field)=> field?.trim()==="")){
 }
 
 // check for user existance
-const existedUser=User.findOne({
+const existedUser=await User.findOne({
     $or : [{username},{email}]
 })
 if(existedUser){
@@ -48,7 +50,7 @@ const avatar=await uploadOnCloudinary(avatarLocalPath);
 const coverImage=await uploadOnCloudinary(coverImageLocalPath);
 
 if(!avatar){
-    throw new ApiError(400,"Error while uploding avatar");
+    throw new ApiError(400,"Error while uploding avatar")
 }
 
 const user =await User.create({
@@ -65,11 +67,10 @@ const createdUser=await User.findById(user._id).select("-password -refreshToken"
 
 //check for user creataion
 if(!createdUser){
-    throw new ApiError(500,"Something went wrong while registering user");
+    throw new ApiError(500,"Something went wrong while registering user")
 
 }
 // return  response
-console.log(res);
 return res.status(201).json(
     new ApiResponse(200,createdUser,"User register succussfully")
 )
