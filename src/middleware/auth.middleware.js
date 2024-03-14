@@ -3,9 +3,11 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import jwt from "jsonwebtoken";
 import { User } from "../models/user.model.js";
 
-export const verifyJWT=asyncHandler(async(req,_,next)=>{
+export const verifyJWT=asyncHandler(async (req,res,next)=>{
+// console.log(req,req.cookies)
 try{
-const token=req.cookie?.accessToken || req.header("Authorization")?.replace("Bearer ","");
+const token=req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ","");
+// console.log("Token",token);
 if(!token){
     throw new ApiError(401,"Unauthorized request");
 }
