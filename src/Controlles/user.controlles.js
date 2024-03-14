@@ -38,23 +38,35 @@ if(existedUser){
 }
 
 // check for image
-const avatarLocalPath=req.files?.avatar[0]?.path;
-const coverImageLocalPath=req.files?.coverImage[0]?.path;
-console.log(avatarLocalPath);
+let avatarLocalPath;
+
+if(req.files && Array.isArray(req.files.avatar) && req.files.avatar.length>0){
+    avatarLocalPath=req.files.avatar[0].path;
+}
+
+let coverImageLocalPath;
+
+if(req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length>0){
+    coverImageLocalPath=req.files.coverImage[0].path;
+}
+
+// console.log(avatarLocalPath);
+// console.log(coverImageLocalPath);
 if(!avatarLocalPath){
 throw new ApiError(400,"Avatar is required")
 }
 
 //upload on cloudinary
+
 const avatar=await uploadOnCloudinary(avatarLocalPath);
 const coverImage=await uploadOnCloudinary(coverImageLocalPath);
-
+// console.log("avatar",avatar);
 if(!avatar){
     throw new ApiError(400,"Error while uploding avatar")
 }
 
 const user =await User.create({
-    username:username.tolowerCase(),
+    username,
     avatar:avatar.url,
     coverImage:coverImage.url,
     email,
