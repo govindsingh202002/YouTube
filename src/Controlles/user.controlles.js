@@ -204,4 +204,108 @@ return res.status(200).cookie("accessToken",AccessToken,options).cookie("refresh
 
 })
 
-export {registerUser,loginUser,logoutUser,refreshAccessToken};
+const updateUserPassword=asyncHandler(async(req,res)=>{
+    const {OldPassword,NewPassword}=req.body
+    if(!OldPassword || !NewPassword){
+        throw new ApiError(404,"Old and New password are required!!")
+    }
+    const user=await User.findById(user?._id);
+    if(!user){
+        throw new ApiError(400,"Please login before changin password")
+    }
+    const isPasswordValid=await user.isPasswordCorrect(OldPassword)
+    if(!isPasswordValid){
+        throw new ApiError(404,"Please enter correct old password!!")
+    }
+    user.password=NewPassword
+    user.save({validateBeforeSave:false});
+    return res.status(200).json(new ApiResponse(200,user,"Password changed successfully"))
+})
+
+const getCurrentUser=asyncHandler(async (req,res)=>{
+    const user=await User.findById(user?._id);
+    if(!user){
+        throw new ApiError(404,"Please login or register")
+    }
+    return res.status(200).json(new ApiResponse(200,user,"succsessfully returned user"))
+})
+
+const updateAccountDetails=asyncHandler(async (req,res)=>{
+    const {NewFullName,NewEmail}=req.body
+    if(!NewFullName || !NewEmail){
+        throw new ApiError(400,"Please enter FullName and Email !!")
+    }
+    const user=await User.findByIdAndUpdate(user?._id,
+        {
+          $set:{
+            fullName:NewFullName,
+            email:NewEmail
+          }  
+        },
+        {new:true}
+    ).select("-password")
+    return res.status(200).json(new ApiResponse(200,user,"User details updated succusefully"))
+})
+
+const updateAvatarFile=asyncHandler(async (req,res)=>{
+    // make sure user is log in and run multer middleware(for accept files) 
+    const AvatarLocalPath= req.file?.path // we write here file not files because we are taking a single file as an input
+    if(!AvatarLocalPath){
+        throw new ApiError(404,"Please provide a avatar file")
+    }
+    const avatar=await uploadOnCloudinary(AvatarLocalPath)
+    if(!avatar.url){
+        throw new ApiError(400,"Error while uploading updated avatar on cloudinary")
+    }
+    const user=await User.findByIdAndUpdate(
+        user?._id,
+        {
+            $set:{
+                avatar:avatar.url
+            }
+        },
+        {
+            new:true
+        }
+    ).select("-password")
+
+    return res.status(200).json(new ApiResponse(200,user,"avatar file updated sucssesfully"))
+
+})
+
+const updateCoverImageFile=asyncHandler(async (req,res)=>{
+    // make sure user is log in and run multer middleware(for accept files) 
+    const CoverImageLocalPath= req.file?.path // we write here file not files because we are taking a single file as an input
+    if(!CoverImageLocalPath){
+        throw new ApiError(404,"Please provide a Cover Image file")
+    }
+    const coverImage=await uploadOnCloudinary(CoverImageLocalPath)
+    if(!coverImage.url){
+        throw new ApiError(400,"Error while uploading updated coverImage on cloudinary")
+    }
+    const user=await User.findByIdAndUpdate(
+        user?._id,
+        {
+            $set:{
+                coverImage:coverImage.url
+            }
+        },
+        {
+            new:true
+        }
+    ).select("-password")
+
+    return res.status(200).json(new ApiResponse(200,user,"coverImage file updated sucssesfully"))
+
+})
+
+export {registerUser,
+    loginUser,
+    logoutUser,
+    refreshAccessToken,
+    updateUserPassword,
+    getCurrentUser,
+    updateAccountDetails,
+    updateAvatarFile,
+    updateCoverImageFile
+};
