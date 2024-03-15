@@ -81,7 +81,7 @@ if(!avatar){
 const user =await User.create({
     username,
     avatar:avatar.url,
-    coverImage:coverImage.url,
+    coverImage:coverImage?.url,
     email,
     fullName,
     password
@@ -114,7 +114,7 @@ send cookies
 */
 async (req,res)=>{
 const {username,email,password}=await req.body;
-console.log("email",email,"username",username,"password",password);
+// console.log("email",email,"username",username,"password",password);
 if(!email && !username){
     throw new ApiError(400,"username or email is required");
 }
@@ -209,7 +209,7 @@ const updateUserPassword=asyncHandler(async(req,res)=>{
     if(!OldPassword || !NewPassword){
         throw new ApiError(404,"Old and New password are required!!")
     }
-    const user=await User.findById(user?._id);
+    const user=await User.findById(req.user?._id);
     if(!user){
         throw new ApiError(400,"Please login before changin password")
     }
@@ -223,7 +223,7 @@ const updateUserPassword=asyncHandler(async(req,res)=>{
 })
 
 const getCurrentUser=asyncHandler(async (req,res)=>{
-    const user=await User.findById(user?._id);
+    const user=await User.findById(req.user?._id);
     if(!user){
         throw new ApiError(404,"Please login or register")
     }
@@ -235,7 +235,7 @@ const updateAccountDetails=asyncHandler(async (req,res)=>{
     if(!NewFullName || !NewEmail){
         throw new ApiError(400,"Please enter FullName and Email !!")
     }
-    const user=await User.findByIdAndUpdate(user?._id,
+    const user=await User.findByIdAndUpdate(req.user?._id,
         {
           $set:{
             fullName:NewFullName,
@@ -258,7 +258,7 @@ const updateAvatarFile=asyncHandler(async (req,res)=>{
         throw new ApiError(400,"Error while uploading updated avatar on cloudinary")
     }
     const user=await User.findByIdAndUpdate(
-        user?._id,
+        req.user?._id,
         {
             $set:{
                 avatar:avatar.url
@@ -284,7 +284,7 @@ const updateCoverImageFile=asyncHandler(async (req,res)=>{
         throw new ApiError(400,"Error while uploading updated coverImage on cloudinary")
     }
     const user=await User.findByIdAndUpdate(
-        user?._id,
+        req.user?._id,
         {
             $set:{
                 coverImage:coverImage.url
